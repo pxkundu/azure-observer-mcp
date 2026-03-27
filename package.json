@@ -1,0 +1,46 @@
+{
+  "name": "azure-observer-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Azure cloud resource provisioning, observation, and control",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "azure-observer-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mcp",
+    "azure",
+    "cloud",
+    "provisioning",
+    "claude"
+  ],
+  "author": "Partha Sarathi Kundu",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@azure/arm-compute": "^22.3.0",
+    "@azure/arm-monitor": "^7.0.0",
+    "@azure/arm-resources": "^6.1.0",
+    "@azure/arm-resources-subscriptions": "^2.1.1",
+    "@azure/arm-storage": "^18.4.0",
+    "@azure/identity": "^4.6.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "pino": "^9.6.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
