@@ -232,18 +232,37 @@ src/
 │   ├── storage.ts
 │   ├── identity.ts
 │   ├── monitor.ts
-│   └── deployments.ts
+│   ├── deployments.ts
+│   ├── billing.ts
+│   ├── advisor.ts
+│   ├── security-scan.ts
+│   ├── appservice-dev.ts
+│   ├── sql-data.ts
+│   ├── apim.ts
+│   ├── cosmos-data.ts
+│   ├── keyvault-meta.ts
+│   └── lifecycle.ts
 ├── services/             # One file per Azure service
 │   ├── subscription.service.ts
 │   ├── resource.service.ts
 │   ├── compute.service.ts
 │   ├── storage.service.ts
 │   ├── identity.service.ts
-│   └── monitor.service.ts
+│   ├── monitor.service.ts
+│   ├── billing.service.ts
+│   ├── advisor.service.ts
+│   ├── security-scan.service.ts
+│   ├── appservice-dev.service.ts
+│   ├── sql-data.service.ts
+│   ├── apim.service.ts
+│   ├── cosmos-data.service.ts
+│   ├── keyvault-meta.service.ts
+│   └── lifecycle-report.service.ts
 └── lib/                  # Shared utilities
     ├── config.ts         # Environment config
     ├── errors.ts         # Error types + helpers
-    └── logger.ts         # pino logger (stderr)
+    ├── logger.ts         # pino logger (stderr)
+    └── arm-parse.ts      # Parse resourceGroup from ARM IDs
 ```
 
 ## Checklist for New Tools

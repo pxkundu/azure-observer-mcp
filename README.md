@@ -73,39 +73,45 @@ See the [Authentication Guide](./docs/authentication.md) for details on all supp
 
 Ask Claude: *"Use the azure/identity/whoami tool to show my Azure identity."*
 
-## Available Tools (20 total)
+## Available Tools (33 total, v0.2.0)
 
 ```mermaid
 graph TD
-    subgraph Foundation["Foundation (6 tools)"]
-        direction LR
-        F1["subscriptions/list"]
-        F2["resource-groups/*"]
-        F3["resources/*"]
+    subgraph Foundation["Foundation (6)"]
+        F1["subscriptions · resource-groups · resources"]
     end
 
-    subgraph Compute["Compute (5 tools)"]
-        direction LR
-        C1["vm/list · vm/get"]
-        C2["vm/start · vm/stop · vm/delete"]
+    subgraph Compute["Compute (5)"]
+        C1["vm list/get/start/stop/delete"]
     end
 
-    subgraph Storage["Storage (3 tools)"]
-        direction LR
-        S1["account/list · account/get · account/create"]
+    subgraph Storage["Storage (3)"]
+        S1["storage account list/get/create"]
     end
 
-    subgraph Observe["Identity & Monitoring (6 tools)"]
-        direction LR
-        O1["identity/whoami"]
-        O2["monitor/activity-log"]
-        O3["deployments/list · deployments/get"]
+    subgraph Observe["Identity & Monitoring (6)"]
+        O1["whoami · activity-log · deployments"]
+    end
+
+    subgraph CostSec["Cost & Security (4)"]
+        CS["billing · advisor · defender alerts/assessments"]
+    end
+
+    subgraph AppStack["App / API / Data (8)"]
+        AS["appservice x3 · sql x2 · apim · cosmos · keyvault"]
+    end
+
+    subgraph Lifecycle["Lifecycle (1)"]
+        L1["devops-report composite"]
     end
 
     style Foundation fill:#e3f2fd,stroke:#1976D2
     style Compute fill:#fff3e0,stroke:#F57C00
     style Storage fill:#e8f5e9,stroke:#388E3C
     style Observe fill:#f3e5f5,stroke:#7B1FA2
+    style CostSec fill:#fff8e1,stroke:#F9A825
+    style AppStack fill:#e0f7fa,stroke:#00838F
+    style Lifecycle fill:#fce4ec,stroke:#AD1457
 ```
 
 | Category | Tools |
@@ -113,10 +119,15 @@ graph TD
 | **Foundation** | `azure/subscriptions/list`, `azure/resource-groups/{list,create,delete}`, `azure/resources/{list,get}` |
 | **Compute** | `azure/compute/vm/{list,get,start,stop,delete}` |
 | **Storage** | `azure/storage/account/{list,get,create}` |
-| **Identity** | `azure/identity/whoami` |
-| **Monitoring** | `azure/monitor/activity-log`, `azure/deployments/{list,get}` |
+| **Identity & monitoring** | `azure/identity/whoami`, `azure/monitor/activity-log`, `azure/deployments/{list,get}` |
+| **Billing & optimization** | `azure/billing/cost-report`, `azure/advisor/recommendations/list` |
+| **Security** | `azure/security/defender/alerts/list`, `azure/security/defender/assessments/list` |
+| **App & API hosting** | `azure/appservice/{sites/list,plans/list,site/get}` |
+| **Data** | `azure/sql/{servers/list,databases/list}`, `azure/cosmos/accounts/list` |
+| **Integration** | `azure/apim/services/list`, `azure/keyvault/vaults/list` |
+| **DevOps composite** | `azure/lifecycle/devops-report` |
 
-See the [Tools Reference](./docs/tools-reference.md) for complete documentation with parameters and examples.
+See the [Tools Reference](./docs/tools-reference.md) and [DevOps lifecycle workflows](./docs/devops-lifecycle.md) for parameters, RBAC, and Claude-oriented workflows.
 
 ## Safety Features
 
@@ -157,7 +168,8 @@ See the [Security Guide](./docs/security.md) for the complete threat model and b
 |-------|-------------|
 | [Getting Started](./docs/getting-started.md) | Installation, first run, and initial setup |
 | [Authentication](./docs/authentication.md) | Azure Entra ID, service principals, managed identity |
-| [Tools Reference](./docs/tools-reference.md) | Complete reference for all 20 tools |
+| [Tools Reference](./docs/tools-reference.md) | Complete reference for all tools |
+| [DevOps & lifecycle](./docs/devops-lifecycle.md) | Billing, security, Advisor, app stack workflows for Claude |
 | [Claude Integration](./docs/claude-integration.md) | Connecting with Claude Code and Claude Desktop |
 | [Hosting Guide](./docs/hosting-guide.md) | Local, Docker, Azure VM, and Container Apps |
 | [Use Cases & Workflows](./docs/use-cases.md) | Practical examples and multi-tool workflows |

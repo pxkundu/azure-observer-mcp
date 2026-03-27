@@ -1,6 +1,6 @@
 {
   "name": "azure-observer-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for Azure cloud resource provisioning, observation, and control",
   "type": "module",
   "main": "dist/index.js",
@@ -27,10 +27,18 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@azure/arm-advisor": "^3.2.0",
+    "@azure/arm-apimanagement": "^10.0.0",
+    "@azure/arm-appservice": "^18.0.0",
     "@azure/arm-compute": "^22.3.0",
+    "@azure/arm-cosmosdb": "^16.4.0",
+    "@azure/arm-costmanagement": "^1.0.0-beta.2",
+    "@azure/arm-keyvault": "^5.0.0",
     "@azure/arm-monitor": "^7.0.0",
     "@azure/arm-resources": "^6.1.0",
     "@azure/arm-resources-subscriptions": "^2.1.1",
+    "@azure/arm-security": "^5.0.0",
+    "@azure/arm-sql": "^10.0.0",
     "@azure/arm-storage": "^18.4.0",
     "@azure/identity": "^4.6.0",
     "@modelcontextprotocol/sdk": "^1.12.1",

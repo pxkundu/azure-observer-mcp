@@ -14,7 +14,7 @@ graph TB
 
     subgraph MCP["Azure Observer MCP Server"]
         direction TB
-        TR[Tool Registry<br/>20 namespaced tools]
+        TR[Tool Registry<br/>33 namespaced tools]
         SL[Service Layer<br/>Azure SDK wrappers]
         AUTH[Auth & Security Layer<br/>Entra ID · RBAC · Dry-run]
         CORE[Core Infrastructure<br/>Zod · Logging · Error handling]
@@ -217,6 +217,26 @@ flowchart TD
 | `azure/deployments/list` | List deployments in a resource group | No |
 | `azure/deployments/get` | Get deployment status and details | No |
 
+### v0.2 — Cost, Advisor, Defender, app stack & composite report
+
+| Tool | Description | Mutating |
+|------|-------------|----------|
+| `azure/billing/cost-report` | Actual cost by ServiceName / RG / region (Cost Management API) | No |
+| `azure/advisor/recommendations/list` | Azure Advisor recommendations | No |
+| `azure/security/defender/alerts/list` | Microsoft Defender for Cloud alerts | No |
+| `azure/security/defender/assessments/list` | Security assessments (posture) | No |
+| `azure/appservice/sites/list` | Web / Function apps | No |
+| `azure/appservice/plans/list` | App Service Plans | No |
+| `azure/appservice/site/get` | Site config (no secret app settings) | No |
+| `azure/sql/servers/list` | Azure SQL servers | No |
+| `azure/sql/databases/list` | Databases on a SQL server | No |
+| `azure/apim/services/list` | API Management instances + gateway URL | No |
+| `azure/cosmos/accounts/list` | Cosmos DB accounts | No |
+| `azure/keyvault/vaults/list` | Key Vault metadata (no secrets) | No |
+| `azure/lifecycle/devops-report` | Composite: cost + Advisor + Defender + guidance | No |
+
+**Additional NPM dependencies**: `@azure/arm-costmanagement` (beta), `@azure/arm-advisor`, `@azure/arm-security`, `@azure/arm-appservice`, `@azure/arm-sql`, `@azure/arm-apimanagement`, `@azure/arm-cosmosdb`, `@azure/arm-keyvault`.
+
 ## Safety Guardrails
 
 ```mermaid
@@ -265,29 +285,20 @@ graph TD
         end
 
         subgraph tools["tools/"]
-            TSUB["subscriptions.ts"]
-            TRG["resource-groups.ts"]
-            TRES["resources.ts"]
-            TCOMP["compute.ts"]
-            TSTOR["storage.ts"]
-            TID["identity.ts"]
-            TMON["monitor.ts"]
-            TDEP["deployments.ts"]
+            TCORE["subscriptions … deployments"]
+            TV2["billing · advisor · security-scan · appservice-dev · sql-data · apim · cosmos · keyvault · lifecycle"]
         end
 
         subgraph services["services/"]
-            SSUB["subscription.service.ts"]
-            SRES["resource.service.ts"]
-            SCOMP["compute.service.ts"]
-            SSTOR["storage.service.ts"]
-            SID["identity.service.ts"]
-            SMON["monitor.service.ts"]
+            SCORE["subscription … monitor"]
+            SV2["billing · advisor · security-scan · appservice-dev · sql-data · apim · cosmos · keyvault · lifecycle-report"]
         end
 
         subgraph lib["lib/"]
             CFG["config.ts"]
             ERR["errors.ts"]
             LOG["logger.ts"]
+            ARM["arm-parse.ts"]
         end
     end
 

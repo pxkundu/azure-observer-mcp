@@ -195,6 +195,31 @@ flowchart TD
 
 ---
 
+## Workflow 8: DevOps snapshot for Claude-built apps (v0.2)
+
+**Scenario**: You ship APIs and web apps on Azure and want **cost**, **Advisor**, and **Defender** context in one pass—ideal for **Claude Code / CLI** review meetings.
+
+```mermaid
+flowchart TD
+    START["'Give me a DevOps health\nsnapshot for subscription S'"]
+    R1["azure/lifecycle/devops-report\n→ cost + advisor + security"]
+    R2["Optional drill-down:\nappservice/sites/list ·\napim/services/list ·\nsql/servers/list"]
+    R3["Claude summarizes:\n• Top spend drivers\n• Security vs cost priorities\n• Next actions"]
+
+    START --> R1 --> R2 --> R3
+
+    style START fill:#f3e5f5,stroke:#7B1FA2
+    style R3 fill:#e8f5e9,stroke:#388E3C
+```
+
+**Try saying**:
+
+> "Run `azure/lifecycle/devops-report` for my subscription, then recommend a prioritized backlog for this sprint."
+
+See [DevOps & lifecycle](./devops-lifecycle.md) for RBAC requirements and detailed flows.
+
+---
+
 ## Quick Reference: Common Prompts
 
 | What you want | What to ask Claude |
@@ -209,3 +234,6 @@ flowchart TD
 | Track deployments | "Show me the status of the latest deployment" |
 | Audit access | "Show me my permissions and recent activity" |
 | Clean up | "Find and delete all test resource groups" |
+| Cost & Advisor | "Show month-to-date cost by service and top Advisor recommendations" |
+| Defender posture | "List unhealthy security assessments and related alerts" |
+| App stack map | "List my API Management gateways and App Service hostnames for the API project" |

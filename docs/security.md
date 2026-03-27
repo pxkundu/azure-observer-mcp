@@ -131,6 +131,8 @@ flowchart LR
 | Dev environment management | Contributor | Specific resource group |
 | Full provisioning | Contributor | Subscription |
 | Admin + IAM | Owner | Subscription |
+| Cost / billing reports (`azure/billing/cost-report`) | [Cost Management Reader](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#cost-management-reader) (or equivalent) | Subscription or billing scope |
+| Defender alerts & assessments | [Security Reader](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#security-reader) or Defender roles | Subscription |
 
 ### Principle of Least Privilege
 

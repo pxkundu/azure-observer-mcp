@@ -6,40 +6,52 @@ Complete reference for all tools provided by the Azure Observer MCP Server.
 
 ```mermaid
 graph TD
-    subgraph Foundation["Foundation Tools"]
-        SL["azure/subscriptions/list"]
-        RGL["azure/resource-groups/list"]
-        RGC["azure/resource-groups/create"]
-        RGD["azure/resource-groups/delete"]
-        RL["azure/resources/list"]
-        RG2["azure/resources/get"]
+    subgraph Foundation["Foundation"]
+        SL["subscriptions/list"]
+        RGL["resource-groups/*"]
+        RL["resources/*"]
     end
 
-    subgraph Compute["Compute Tools"]
-        VML["azure/compute/vm/list"]
-        VMG["azure/compute/vm/get"]
-        VMSTART["azure/compute/vm/start"]
-        VMSTOP["azure/compute/vm/stop"]
-        VMDEL["azure/compute/vm/delete"]
+    subgraph Compute["Compute"]
+        VM["compute/vm/*"]
     end
 
-    subgraph Storage["Storage Tools"]
-        SAL["azure/storage/account/list"]
-        SAG["azure/storage/account/get"]
-        SAC["azure/storage/account/create"]
+    subgraph Storage["Storage"]
+        ST["storage/account/*"]
     end
 
     subgraph Observe["Identity & Monitoring"]
-        WHO["azure/identity/whoami"]
-        ACT["azure/monitor/activity-log"]
-        DPL["azure/deployments/list"]
-        DPG["azure/deployments/get"]
+        WHO["identity/whoami"]
+        ACT["monitor/activity-log"]
+        DEP["deployments/*"]
+    end
+
+    subgraph CostSec["Cost & Security"]
+        BILL["billing/cost-report"]
+        ADV["advisor/recommendations/list"]
+        DEFA["security/defender/alerts"]
+        DEFS["security/defender/assessments"]
+    end
+
+    subgraph DevStack["App / API / Data"]
+        APP["appservice/sites|plans|site"]
+        SQL["sql/servers|databases"]
+        APIM["apim/services"]
+        COS["cosmos/accounts"]
+        KV["keyvault/vaults"]
+    end
+
+    subgraph Lifecycle["Lifecycle"]
+        LIF["lifecycle/devops-report"]
     end
 
     style Foundation fill:#e3f2fd,stroke:#1976D2
     style Compute fill:#fff3e0,stroke:#F57C00
     style Storage fill:#e8f5e9,stroke:#388E3C
     style Observe fill:#f3e5f5,stroke:#7B1FA2
+    style CostSec fill:#fff8e1,stroke:#F9A825
+    style DevStack fill:#e0f7fa,stroke:#00838F
+    style Lifecycle fill:#fce4ec,stroke:#AD1457
 ```
 
 ---
@@ -394,3 +406,156 @@ Get detailed status and outputs of a specific deployment.
 | `deploymentName` | string | Yes | Deployment name |
 
 **Example prompt**: "Show me the status and outputs of the 'webapp-deploy' deployment"
+
+---
+
+## Billing & cost (Cost Management)
+
+### `azure/billing/cost-report`
+
+Query **actual cost** aggregated by Azure dimension (requires Cost Management permissions, e.g. Cost Management Reader).
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `groupBy` | enum | No | `ServiceName` (default), `ResourceGroupName`, or `ResourceLocation` |
+| `timeframe` | enum | No | `MonthToDate`, `TheLastMonth`, `WeekToDate`, or `Custom` |
+| `from` / `to` | string | For Custom | ISO date range |
+| `maxRows` | number | No | 1–100 (default 25) |
+
+**Example prompt**: "Show month-to-date Azure cost broken down by service for subscription X"
+
+---
+
+## Azure Advisor
+
+### `azure/advisor/recommendations/list`
+
+List **Azure Advisor** recommendations (cost, security, reliability, performance, operational excellence).
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `category` | enum | No | `Cost`, `Security`, `Performance`, `OperationalExcellence`, `HighAvailability` |
+| `maxItems` | number | No | 1–200 (default 50) |
+
+**Example prompt**: "List top Security category Advisor recommendations for my subscription"
+
+---
+
+## Microsoft Defender for Cloud
+
+### `azure/security/defender/alerts/list`
+
+List **Defender for Cloud alerts** (threat detection).
+
+- **Mutating**: No
+- **Requires**: Security Reader or equivalent Defender access
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `subscriptionId` | string | Subscription ID |
+| `maxItems` | number | Max alerts (default 40) |
+
+---
+
+### `azure/security/defender/assessments/list`
+
+List **security assessments** (posture) with per-resource status. Use unhealthy rows as a remediation backlog.
+
+- **Mutating**: No
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `subscriptionId` | string | Subscription ID |
+| `maxItems` | number | Max assessments (default 100, cap 300) |
+
+---
+
+## App Service & Functions (build / deploy targets)
+
+### `azure/appservice/sites/list`
+
+List **web apps and function apps** (App Service resources).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `subscriptionId` | string | Required |
+| `resourceGroupName` | string | Optional filter |
+
+---
+
+### `azure/appservice/plans/list`
+
+List **App Service Plans** (hosting SKUs).
+
+---
+
+### `azure/appservice/site/get`
+
+Get site metadata: default hostname, HTTPS-only, runtime stack hints, CORS allowed origins. **Does not** return app settings or connection strings.
+
+---
+
+## Azure SQL
+
+### `azure/sql/servers/list`
+
+List **SQL logical servers**.
+
+### `azure/sql/databases/list`
+
+List **user databases** on a server (system DBs excluded).
+
+---
+
+## API Management
+
+### `azure/apim/services/list`
+
+List **API Management** services with **gateway URL** (public API base for Claude-built APIs).
+
+---
+
+## Cosmos DB
+
+### `azure/cosmos/accounts/list`
+
+List **Cosmos DB accounts** with document endpoint.
+
+---
+
+## Key Vault (metadata only)
+
+### `azure/keyvault/vaults/list`
+
+List vaults: URI, SKU, RBAC authorization mode. **Never returns secret values.**
+
+---
+
+## Composite DevOps report
+
+### `azure/lifecycle/devops-report`
+
+Single call that aggregates:
+
+- Month-to-date **cost by service** (if Cost API succeeds)
+- **Advisor** recommendations (filterable by category)
+- **Defender** alerts and a sample of **unhealthy** assessments
+- Short **Claude guidance** bullets for prioritization
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `subscriptionId` | string | Required |
+| `includeCost` / `includeAdvisor` / `includeSecurity` | boolean | Toggle sections (default true) |
+| `advisorMax` | number | Max advisor rows |
+| `advisorCategories` | string[] | Optional filter |
+| `securityAlertsMax` / `securityAssessmentsMax` | number | Limits |
+
+**Example prompt**: "Run the Azure lifecycle DevOps report for my subscription and suggest a prioritized remediation plan"
