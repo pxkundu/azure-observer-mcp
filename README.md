@@ -199,15 +199,17 @@ See the [Security Guide](./docs/security.md) for the complete threat model and b
 | [Hosting Guide](./docs/hosting-guide.md) | Local, Docker, Azure VM, and Container Apps |
 | [Use Cases & Workflows](./docs/use-cases.md) | Practical examples and multi-tool workflows |
 | [Security](./docs/security.md) | Threat model, RBAC, and best practices |
+| [Testing Guide](./docs/testing-guide.md) | Test cases, validation scripts, and Claude CLI test prompts |
 | [Contributing](./docs/contributing.md) | How to add new tools and services |
 | [Architecture](./ARCHITECTURE.md) | Solution architecture and design decisions |
 
 ## Development
 
 ```bash
-npm run dev     # Run with tsx (hot reload)
-npm run build   # Build for production
-npm run lint    # Type check
+npm run dev              # Run with tsx (hot reload)
+npm run build            # Build for production
+npm run lint             # Type check
+npm run test:validate    # Run automated tool validation (requires az login)
 ```
 
 ## License
