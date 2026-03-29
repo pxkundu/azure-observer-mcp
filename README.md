@@ -73,7 +73,7 @@ See the [Authentication Guide](./docs/authentication.md) for details on all supp
 
 Ask Claude: *"Use the azure/identity/whoami tool to show my Azure identity."*
 
-## Available Tools (33 total, v0.2.0)
+## Available Tools (45 total, v0.3.0)
 
 ```mermaid
 graph TD
@@ -101,6 +101,22 @@ graph TD
         AS["appservice x3 · sql x2 · apim · cosmos · keyvault"]
     end
 
+    subgraph Network["Networking (4)"]
+        N1["vnet · nsg · nsg-rules · public-ip"]
+    end
+
+    subgraph Containers["Containers (4)"]
+        K1["aks list/get · acr list/get"]
+    end
+
+    subgraph Logs["Observability (2)"]
+        LG["log-analytics workspaces · KQL query"]
+    end
+
+    subgraph DNS["DNS (2)"]
+        DN["zones · record sets"]
+    end
+
     subgraph Lifecycle["Lifecycle (1)"]
         L1["devops-report composite"]
     end
@@ -111,6 +127,10 @@ graph TD
     style Observe fill:#f3e5f5,stroke:#7B1FA2
     style CostSec fill:#fff8e1,stroke:#F9A825
     style AppStack fill:#e0f7fa,stroke:#00838F
+    style Network fill:#fbe9e7,stroke:#BF360C
+    style Containers fill:#e8eaf6,stroke:#283593
+    style Logs fill:#f1f8e9,stroke:#33691E
+    style DNS fill:#fff9c4,stroke:#F57F17
     style Lifecycle fill:#fce4ec,stroke:#AD1457
 ```
 
@@ -125,6 +145,10 @@ graph TD
 | **App & API hosting** | `azure/appservice/{sites/list,plans/list,site/get}` |
 | **Data** | `azure/sql/{servers/list,databases/list}`, `azure/cosmos/accounts/list` |
 | **Integration** | `azure/apim/services/list`, `azure/keyvault/vaults/list` |
+| **Networking** | `azure/network/{vnet/list,nsg/list,nsg/rules,publicip/list}` |
+| **Containers** | `azure/containers/aks/{list,get}`, `azure/containers/acr/{list,get}` |
+| **Observability** | `azure/logs/{workspace/list,query}` |
+| **DNS** | `azure/dns/{zone/list,recordset/list}` |
 | **DevOps composite** | `azure/lifecycle/devops-report` |
 
 See the [Tools Reference](./docs/tools-reference.md) and [DevOps lifecycle workflows](./docs/devops-lifecycle.md) for parameters, RBAC, and Claude-oriented workflows.
@@ -170,6 +194,7 @@ See the [Security Guide](./docs/security.md) for the complete threat model and b
 | [Authentication](./docs/authentication.md) | Azure Entra ID, service principals, managed identity |
 | [Tools Reference](./docs/tools-reference.md) | Complete reference for all tools |
 | [DevOps & lifecycle](./docs/devops-lifecycle.md) | Billing, security, Advisor, app stack workflows for Claude |
+| [Networking, Containers & Observability](./docs/networking-containers-observability.md) | VNet, AKS, ACR, Log Analytics + KQL, DNS workflows |
 | [Claude Integration](./docs/claude-integration.md) | Connecting with Claude Code and Claude Desktop |
 | [Hosting Guide](./docs/hosting-guide.md) | Local, Docker, Azure VM, and Container Apps |
 | [Use Cases & Workflows](./docs/use-cases.md) | Practical examples and multi-tool workflows |

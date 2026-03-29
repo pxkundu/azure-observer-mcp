@@ -35,10 +35,22 @@ import { registerCosmosDataTools } from "./tools/cosmos-data.js";
 import { registerKeyVaultMetaTools } from "./tools/keyvault-meta.js";
 import { registerLifecycleTools } from "./tools/lifecycle.js";
 
+import { NetworkService } from "./services/network.service.js";
+import { AksService } from "./services/aks.service.js";
+import { AcrService } from "./services/acr.service.js";
+import { LogAnalyticsService } from "./services/log-analytics.service.js";
+import { DnsService } from "./services/dns.service.js";
+
+import { registerNetworkTools } from "./tools/network.js";
+import { registerAksTools } from "./tools/aks.js";
+import { registerAcrTools } from "./tools/acr.js";
+import { registerLogAnalyticsTools } from "./tools/log-analytics.js";
+import { registerDnsTools } from "./tools/dns.js";
+
 export function createServer(azureCtx: AzureContext): McpServer {
   const server = new McpServer({
     name: "azure-observer",
-    version: "0.2.0",
+    version: "0.3.0",
   });
 
   const subscriptionService = new SubscriptionService(azureCtx);
@@ -74,6 +86,18 @@ export function createServer(azureCtx: AzureContext): McpServer {
   registerCosmosDataTools(server, cosmosDataService);
   registerKeyVaultMetaTools(server, keyVaultMetaService);
   registerLifecycleTools(server, lifecycleReportService);
+
+  const networkService = new NetworkService(azureCtx);
+  const aksService = new AksService(azureCtx);
+  const acrService = new AcrService(azureCtx);
+  const logAnalyticsService = new LogAnalyticsService(azureCtx);
+  const dnsService = new DnsService(azureCtx);
+
+  registerNetworkTools(server, networkService);
+  registerAksTools(server, aksService);
+  registerAcrTools(server, acrService);
+  registerLogAnalyticsTools(server, logAnalyticsService);
+  registerDnsTools(server, dnsService);
 
   azureCtx.logger.info("All Azure Observer MCP tools registered");
 

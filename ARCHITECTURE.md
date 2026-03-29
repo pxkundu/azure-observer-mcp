@@ -14,7 +14,7 @@ graph TB
 
     subgraph MCP["Azure Observer MCP Server"]
         direction TB
-        TR[Tool Registry<br/>33 namespaced tools]
+        TR[Tool Registry<br/>45 namespaced tools]
         SL[Service Layer<br/>Azure SDK wrappers]
         AUTH[Auth & Security Layer<br/>Entra ID · RBAC · Dry-run]
         CORE[Core Infrastructure<br/>Zod · Logging · Error handling]
@@ -64,6 +64,10 @@ graph LR
         T6[identity]
         T7[monitor]
         T8[deployments]
+        T9[network]
+        T10[aks · acr]
+        T11[log-analytics]
+        T12[dns]
     end
 
     subgraph Services["Service Layer"]
@@ -73,6 +77,10 @@ graph LR
         S4[StorageService]
         S5[IdentityService]
         S6[MonitorService]
+        S7[NetworkService]
+        S8[AksService · AcrService]
+        S9[LogAnalyticsService]
+        S10[DnsService]
     end
 
     subgraph Lib["Core Libraries"]
@@ -86,14 +94,18 @@ graph LR
     end
 
     IDX --> SRV
-    SRV --> T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8
+    SRV --> T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9 & T10 & T11 & T12
     T1 --> S1
     T2 & T3 & T8 --> S2
     T4 --> S3
     T5 --> S4
     T6 --> S5
     T7 --> S6
-    S1 & S2 & S3 & S4 & S5 & S6 --> CRED
+    T9 --> S7
+    T10 --> S8
+    T11 --> S9
+    T12 --> S10
+    S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 --> CRED
     CRED --> CFG & ERR & LOG
 ```
 
@@ -235,7 +247,24 @@ flowchart TD
 | `azure/keyvault/vaults/list` | Key Vault metadata (no secrets) | No |
 | `azure/lifecycle/devops-report` | Composite: cost + Advisor + Defender + guidance | No |
 
-**Additional NPM dependencies**: `@azure/arm-costmanagement` (beta), `@azure/arm-advisor`, `@azure/arm-security`, `@azure/arm-appservice`, `@azure/arm-sql`, `@azure/arm-apimanagement`, `@azure/arm-cosmosdb`, `@azure/arm-keyvault`.
+### v0.3 — Networking, Containers, Log Analytics & DNS
+
+| Tool | Description | Mutating |
+|------|-------------|----------|
+| `azure/network/vnet/list` | Virtual Networks (subscription or RG-scoped) | No |
+| `azure/network/nsg/list` | Network Security Groups | No |
+| `azure/network/nsg/rules` | Security rules for a specific NSG | No |
+| `azure/network/publicip/list` | Public IP addresses | No |
+| `azure/containers/aks/list` | AKS managed Kubernetes clusters | No |
+| `azure/containers/aks/get` | AKS cluster detail (node pools, networking) | No |
+| `azure/containers/acr/list` | Azure Container Registries | No |
+| `azure/containers/acr/get` | ACR detail (SKU, encryption, login server) | No |
+| `azure/logs/workspace/list` | Log Analytics workspaces | No |
+| `azure/logs/query` | Run KQL queries against Log Analytics | No |
+| `azure/dns/zone/list` | Azure DNS zones | No |
+| `azure/dns/recordset/list` | DNS record sets (filterable by type) | No |
+
+**Additional NPM dependencies (v0.3)**: `@azure/arm-network`, `@azure/arm-containerservice`, `@azure/arm-containerregistry`, `@azure/arm-operationalinsights`, `@azure/monitor-query-logs`, `@azure/arm-dns`.
 
 ## Safety Guardrails
 
@@ -287,11 +316,13 @@ graph TD
         subgraph tools["tools/"]
             TCORE["subscriptions … deployments"]
             TV2["billing · advisor · security-scan · appservice-dev · sql-data · apim · cosmos · keyvault · lifecycle"]
+            TV3["network · aks · acr · log-analytics · dns"]
         end
 
         subgraph services["services/"]
             SCORE["subscription … monitor"]
             SV2["billing · advisor · security-scan · appservice-dev · sql-data · apim · cosmos · keyvault · lifecycle-report"]
+            SV3["network · aks · acr · log-analytics · dns"]
         end
 
         subgraph lib["lib/"]
@@ -345,23 +376,26 @@ export function registerMyTools(server: McpServer, deps: Dependencies) {
 }
 ```
 
-## Future Roadmap (post-v1)
+## Future Roadmap
 
 ```mermaid
 timeline
     title Azure Observer Roadmap
-    v1 - Foundation : Subscriptions · Resource Groups
-                    : VMs · Storage Accounts
-                    : Identity · Activity Log
-                    : Deployments
-    v2 - Networking : VNet · Subnet · NSG
-                    : Public IP · Load Balancer
-    v3 - Data       : Azure SQL · Cosmos DB
-                    : App Service · Functions
-    v4 - Advanced   : ARM/Bicep Templates
-                    : Cost Estimation
-                    : Workflow Tools
-    v5 - Enterprise : HTTP Transport
-                    : Multi-tenant Auth
-                    : Audit Logging
+    v0.1 - Foundation : Subscriptions · Resource Groups
+                      : VMs · Storage · Identity
+                      : Activity Log · Deployments
+    v0.2 - Cost+Security : Billing · Advisor · Defender
+                         : App Service · SQL · APIM
+                         : Cosmos DB · Key Vault
+                         : DevOps lifecycle report
+    v0.3 - Networking+Containers : VNet · NSG · Public IP
+                                 : AKS · ACR
+                                 : Log Analytics + KQL
+                                 : Azure DNS
+    v1.0 - Advanced : ARM/Bicep template deploy
+                    : Load Balancer · App Gateway
+                    : Resource tagging workflows
+    v2.0 - Enterprise : HTTP transport
+                      : Multi-tenant auth
+                      : Audit logging
 ```

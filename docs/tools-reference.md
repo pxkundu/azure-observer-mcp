@@ -41,6 +41,27 @@ graph TD
         KV["keyvault/vaults"]
     end
 
+    subgraph Network["Networking"]
+        VNET["network/vnet/list"]
+        NSG["network/nsg/list|rules"]
+        PIP["network/publicip/list"]
+    end
+
+    subgraph Containers["Containers"]
+        AKS["containers/aks/list|get"]
+        ACR["containers/acr/list|get"]
+    end
+
+    subgraph Logs["Observability"]
+        LAW["logs/workspace/list"]
+        KQL["logs/query"]
+    end
+
+    subgraph DNS["DNS"]
+        ZN["dns/zone/list"]
+        RS["dns/recordset/list"]
+    end
+
     subgraph Lifecycle["Lifecycle"]
         LIF["lifecycle/devops-report"]
     end
@@ -51,6 +72,10 @@ graph TD
     style Observe fill:#f3e5f5,stroke:#7B1FA2
     style CostSec fill:#fff8e1,stroke:#F9A825
     style DevStack fill:#e0f7fa,stroke:#00838F
+    style Network fill:#fbe9e7,stroke:#BF360C
+    style Containers fill:#e8eaf6,stroke:#283593
+    style Logs fill:#f1f8e9,stroke:#33691E
+    style DNS fill:#fff9c4,stroke:#F57F17
     style Lifecycle fill:#fce4ec,stroke:#AD1457
 ```
 
@@ -559,3 +584,285 @@ Single call that aggregates:
 | `securityAlertsMax` / `securityAssessmentsMax` | number | Limits |
 
 **Example prompt**: "Run the Azure lifecycle DevOps report for my subscription and suggest a prioritized remediation plan"
+
+---
+
+## Networking Tools
+
+### `azure/network/vnet/list`
+
+List virtual networks — optionally scoped to a resource group, otherwise subscription-wide.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group (omit for all VNets) |
+
+**Example prompt**: "List all virtual networks in my subscription"
+
+**Example response**:
+
+```json
+{
+  "count": 2,
+  "virtualNetworks": [
+    {
+      "name": "prod-vnet",
+      "location": "eastus",
+      "addressSpace": ["10.0.0.0/16"],
+      "subnets": [
+        { "name": "default", "addressPrefix": "10.0.0.0/24" },
+        { "name": "aks-subnet", "addressPrefix": "10.0.1.0/24" }
+      ],
+      "provisioningState": "Succeeded"
+    }
+  ]
+}
+```
+
+---
+
+### `azure/network/nsg/list`
+
+List Network Security Groups — optionally scoped to a resource group.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group |
+
+**Example prompt**: "Show all NSGs in the 'network-rg' resource group"
+
+---
+
+### `azure/network/nsg/rules`
+
+Get the security rules for a specific Network Security Group. Useful for auditing open ports and allowed traffic.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | Yes | Resource group name |
+| `nsgName` | string | Yes | Network Security Group name |
+
+**Example prompt**: "Show me the security rules for the 'web-nsg' network security group — are any ports open to the internet?"
+
+**Example response**:
+
+```json
+{
+  "name": "web-nsg",
+  "rules": [
+    {
+      "name": "Allow-HTTPS",
+      "priority": 100,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "sourceAddressPrefix": "*",
+      "destinationPortRange": "443"
+    }
+  ]
+}
+```
+
+---
+
+### `azure/network/publicip/list`
+
+List public IP addresses — optionally scoped to a resource group.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group |
+
+**Example prompt**: "List all public IPs in my subscription"
+
+---
+
+## Container Tools
+
+### `azure/containers/aks/list`
+
+List AKS (Azure Kubernetes Service) managed clusters — optionally scoped to a resource group.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group |
+
+**Example prompt**: "List all Kubernetes clusters in my subscription"
+
+---
+
+### `azure/containers/aks/get`
+
+Get detailed AKS cluster info including networking configuration, node pool details, and autoscaling settings.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | Yes | Resource group name |
+| `clusterName` | string | Yes | AKS cluster name |
+
+**Example prompt**: "Show me details about the 'prod-aks' cluster — what node pools and Kubernetes version is it running?"
+
+**Example response**:
+
+```json
+{
+  "name": "prod-aks",
+  "kubernetesVersion": "1.29.2",
+  "fqdn": "prod-aks-abc123.hcp.eastus.azmk8s.io",
+  "networkPlugin": "azure",
+  "nodePools": [
+    {
+      "name": "system",
+      "vmSize": "Standard_D4s_v5",
+      "count": 3,
+      "enableAutoScaling": true,
+      "minCount": 2,
+      "maxCount": 5,
+      "mode": "System"
+    }
+  ]
+}
+```
+
+---
+
+### `azure/containers/acr/list`
+
+List Azure Container Registries — optionally scoped to a resource group.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group |
+
+**Example prompt**: "List all container registries in my subscription"
+
+---
+
+### `azure/containers/acr/get`
+
+Get detailed ACR registry info — SKU, login server, encryption status, public network access.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | Yes | Resource group name |
+| `registryName` | string | Yes | Container registry name |
+
+**Example prompt**: "Show me the details for the 'prodimages' container registry"
+
+---
+
+## Observability Tools (Log Analytics + KQL)
+
+### `azure/logs/workspace/list`
+
+List Log Analytics workspaces — optionally scoped to a resource group.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | No | Scope to a resource group |
+
+**Example prompt**: "List all Log Analytics workspaces in my subscription"
+
+---
+
+### `azure/logs/query`
+
+Run a KQL (Kusto Query Language) query against a Log Analytics workspace. Returns up to 200 rows. Extremely powerful for diagnostics, security investigations, and performance analysis.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workspaceId` | string | Yes | Log Analytics workspace ID (the GUID customerId, not the ARM resource ID) |
+| `kqlQuery` | string | Yes | KQL query string |
+| `timeSpan` | string | No | ISO 8601 duration — `P1D` (1 day, default), `PT1H` (1 hour), `P7D` (7 days) |
+
+**Example prompt**: "Query the Log Analytics workspace for all Error-level Azure Activity events in the last 24 hours"
+
+**Example KQL queries**:
+
+```kql
+// Recent errors in activity log
+AzureActivity | where Level == "Error" | take 20
+
+// Container insights — pod restart count
+KubePodInventory | summarize restarts=sum(PodRestartCount) by Name | top 10 by restarts
+
+// Application Insights — failed requests
+requests | where success == false | summarize count() by name | top 10 by count_
+
+// Sign-in failures
+SigninLogs | where ResultType != "0" | summarize count() by UserPrincipalName, ResultDescription | top 20 by count_
+```
+
+---
+
+## DNS Tools
+
+### `azure/dns/zone/list`
+
+List all Azure DNS zones in a subscription.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+
+**Example prompt**: "List all DNS zones in my subscription"
+
+---
+
+### `azure/dns/recordset/list`
+
+List DNS record sets for a zone — optionally filtered by record type.
+
+- **Mutating**: No
+- **Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `subscriptionId` | string | Yes | Azure subscription ID |
+| `resourceGroupName` | string | Yes | Resource group name |
+| `zoneName` | string | Yes | DNS zone name (e.g. `contoso.com`) |
+| `recordType` | string | No | Filter by type: `A`, `AAAA`, `CNAME`, `MX`, `NS`, `TXT`, `SRV` |
+
+**Example prompt**: "Show me all A records for the contoso.com DNS zone"

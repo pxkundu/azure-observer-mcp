@@ -220,6 +220,90 @@ See [DevOps & lifecycle](./devops-lifecycle.md) for RBAC requirements and detail
 
 ---
 
+## Workflow 9: Network Topology & Security Audit (v0.3)
+
+**Scenario**: You need to understand and audit the network layout — VNets, NSGs, and public IPs — before deploying a new service.
+
+```mermaid
+flowchart TD
+    START["'Audit the network topology\nfor subscription S'"]
+    S1["azure/network/vnet/list\n→ lists VNets + subnets"]
+    S2["azure/network/nsg/list\n→ lists all NSGs"]
+    S3["azure/network/nsg/rules\n→ inspects rules on critical NSGs"]
+    S4["azure/network/publicip/list\n→ finds exposed public IPs"]
+    S5["Claude summarizes:\n• VNet topology map\n• Open port warnings\n• Unused public IPs"]
+
+    START --> S1 --> S2 --> S3 --> S4 --> S5
+
+    style START fill:#f3e5f5,stroke:#7B1FA2
+    style S5 fill:#e8f5e9,stroke:#388E3C
+```
+
+**Try saying**:
+
+> "List all VNets and their subnets, then show me every NSG with its rules. Flag any rules that allow traffic from the internet (source *) to sensitive ports like 22 or 3389."
+
+---
+
+## Workflow 10: Kubernetes Cluster Health Check (v0.3)
+
+**Scenario**: You run containerized workloads on AKS and want a cluster health snapshot.
+
+```mermaid
+flowchart TD
+    START["'Check my AKS clusters'"]
+    S1["azure/containers/aks/list\n→ all clusters + versions"]
+    S2["azure/containers/aks/get\n→ node pools, autoscaling"]
+    S3["azure/containers/acr/list\n→ linked container registries"]
+    S4["azure/logs/query\n→ KQL: KubePodInventory restarts"]
+    S5["Claude reports:\n• K8s version status\n• Node pool scaling\n• Pod restart hotspots"]
+
+    START --> S1 --> S2 --> S3 --> S4 --> S5
+
+    style START fill:#f3e5f5,stroke:#7B1FA2
+    style S5 fill:#e8f5e9,stroke:#388E3C
+```
+
+**Try saying**:
+
+> "List my AKS clusters, check their Kubernetes versions, get node pool details, and then query Log Analytics for pods with high restart counts in the last 24 hours."
+
+---
+
+## Workflow 11: Log Analytics Diagnostics (v0.3)
+
+**Scenario**: An app is misbehaving. You want to run KQL queries to investigate without leaving Claude.
+
+```mermaid
+flowchart TD
+    START["'Investigate errors in\nmy web app logs'"]
+    S1["azure/logs/workspace/list\n→ find the right workspace"]
+    S2["azure/logs/query\n→ KQL: AppRequests failures"]
+    S3["azure/logs/query\n→ KQL: AppExceptions details"]
+    S4["Claude: 'Found 47 failed requests\nin the last hour, 90% are\n500 errors on /api/payments.\nTop exception: NullReferenceException\nin PaymentService.Process()'"]
+
+    START --> S1 --> S2 --> S3 --> S4
+
+    style START fill:#f3e5f5,stroke:#7B1FA2
+    style S4 fill:#ffebee,stroke:#C62828
+```
+
+**Try saying**:
+
+> "Find my Log Analytics workspace, then run a KQL query to show failed HTTP requests in the last hour grouped by URL. Then query for the top exceptions."
+
+---
+
+## Workflow 12: DNS Record Inventory (v0.3)
+
+**Scenario**: You need to verify DNS records before a domain migration or SSL renewal.
+
+**Try saying**:
+
+> "List all DNS zones in my subscription, then show me the A and CNAME records for contoso.com."
+
+---
+
 ## Quick Reference: Common Prompts
 
 | What you want | What to ask Claude |
@@ -237,3 +321,8 @@ See [DevOps & lifecycle](./devops-lifecycle.md) for RBAC requirements and detail
 | Cost & Advisor | "Show month-to-date cost by service and top Advisor recommendations" |
 | Defender posture | "List unhealthy security assessments and related alerts" |
 | App stack map | "List my API Management gateways and App Service hostnames for the API project" |
+| Network audit | "List all VNets and NSG rules — flag anything open to the internet" |
+| AKS health | "Show me my AKS clusters, versions, and node pool autoscaling" |
+| Container registries | "List all ACRs and their login servers" |
+| Log investigation | "Query Log Analytics for errors in the last 6 hours using KQL" |
+| DNS check | "List all DNS zones and A records for contoso.com" |
